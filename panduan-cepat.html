@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panduan Cepat - Grafika Komputer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #f5f5f5;
+      line-height: 1.6;
+    }
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .nav {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .nav a {
+      display: inline-block;
+      margin: 5px;
+      padding: 8px 16px;
+      background: #667eea;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+    .section {
+      background: white;
+      padding: 25px;
+      margin: 20px 0;
+      border-radius: 8px;
+    }
+    h2 {
+      color: #667eea;
+      border-bottom: 2px solid #667eea;
+      padding-bottom: 10px;
+    }
+    code {
+      background: #f4f4f4;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: monospace;
+    }
+    pre {
+      background: #2d2d2d;
+      color: #f8f8f2;
+      padding: 15px;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+    .step {
+      background: #e3f2fd;
+      padding: 15px;
+      margin: 15px 0;
+      border-left: 4px solid #2196F3;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>⚡ Panduan Cepat</h1>
+    <p>Mulai dalam 5 menit!</p>
+  </div>
+
+  <div class="nav">
+    <a href="mulai-disini.html">🏠 Beranda</a>
+    <a href="demo-sederhana.html">✨ Demo</a>
+    <a href="tutorial-lengkap.html">📖 Tutorial</a>
+  </div>
+
+  <div class="section">
+    <h2>🚀 Setup Proyek</h2>
+
+    <div class="step">
+      <strong>Step 1: Install Dependencies</strong>
+      <pre>npm install</pre>
+    </div>
+
+    <div class="step">
+      <strong>Step 2: Build TypeScript</strong>
+      <pre>npm run build</pre>
+    </div>
+
+    <div class="step">
+      <strong>Step 3: Jalankan Server</strong>
+      <pre>npm run serve</pre>
+    </div>
+
+    <div class="step">
+      <strong>Step 4: Buka Browser</strong>
+      <p>Akses: <code>http://localhost:8080/mulai-disini.html</code></p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>📖 Konsep Dasar</h2>
+
+    <h3>1. Gambar Piksel (Raster/Bitmap)</h3>
+    <p>Gambar tersusun dari grid piksel-piksel kecil:</p>
+    <ul>
+      <li>Setiap piksel menyimpan warna RGBA (Red, Green, Blue, Alpha)</li>
+      <li>Resolusi tetap (misalnya 800×600 piksel)</li>
+      <li>Kehilangan kualitas saat diperbesar (pixelated)</li>
+      <li>Contoh format: PNG, JPG, BMP</li>
+    </ul>
+
+    <h3>2. Gambar Vektor</h3>
+    <p>Gambar menggunakan rumus matematis:</p>
+    <ul>
+      <li>Disimpan sebagai shapes (lingkaran, garis, polygon)</li>
+      <li>Resolusi independen (bisa diperbesar tanpa kehilangan kualitas)</li>
+      <li>Ukuran file lebih kecil</li>
+      <li>Contoh format: SVG, AI, PDF</li>
+    </ul>
+
+    <h3>3. Sistem Koordinat 2D</h3>
+    <p>Dua jenis koordinat:</p>
+    <ul>
+      <li><strong>Kartesian:</strong> Origin di tengah, Y positif ke atas</li>
+      <li><strong>Canvas:</strong> Origin di kiri atas, Y positif ke bawah</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>💻 Contoh Kode</h2>
+
+    <h3>Gambar Piksel</h3>
+    <pre>const canvas = document.getElementById('myCanvas');
+const ctx = canvas.getContext('2d');
+
+// Gambar lingkaran
+ctx.fillStyle = '#ff5733';
+ctx.beginPath();
+ctx.arc(200, 150, 60, 0, Math.PI * 2);
+ctx.fill();</pre>
+
+    <h3>Gambar Vektor (Data)</h3>
+    <pre>const circle = {
+  type: 'circle',
+  center: { x: 200, y: 150 },
+  radius: 60,
+  color: { r: 255, g: 87, b: 51, a: 1 }
+};</pre>
+
+    <h3>Konversi Koordinat</h3>
+    <pre>// Kartesian ke Canvas
+function cartesianToCanvas(x, y) {
+  const originX = canvasWidth / 2;
+  const originY = canvasHeight / 2;
+  return {
+    x: originX + x,
+    y: originY - y  // Y dibalik
+  };
+}</pre>
+  </div>
+
+  <div class="section">
+    <h2>🎯 Langkah Selanjutnya</h2>
+
+    <ol>
+      <li>Coba <a href="demo-sederhana.html">Demo Sederhana</a> untuk melihat perbedaan piksel vs vektor</li>
+      <li>Eksplorasi <a href="demo-lengkap.html">Demo Lengkap</a> untuk fitur lebih banyak</li>
+      <li>Ikuti <a href="tutorial-lengkap.html">Tutorial Lengkap</a> untuk pembelajaran mendalam</li>
+    </ol>
+  </div>
+
+  <div class="nav">
+    <a href="mulai-disini.html">🏠 Kembali ke Beranda</a>
+  </div>
+</body>
+</html>

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Reflection</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    h1 {
+      color: #333;
+      text-align: center;
+    }
+    canvas {
+      border: 2px solid #333;
+      margin: 20px auto;
+      display: block;
+      background: white;
+    }
+    .controls {
+      text-align: center;
+      margin: 20px 0;
+    }
+    .btn {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      margin: 5px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+    }
+    .btn:hover {
+      background: #5568d3;
+    }
+    .btn-secondary {
+      background: #48bb78;
+    }
+    .btn-secondary:hover {
+      background: #38a169;
+    }
+    .info {
+      background: white;
+      padding: 15px;
+      border-radius: 5px;
+      margin: 20px 0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .status {
+      text-align: center;
+      padding: 10px;
+      background: #e0e0e0;
+      border-radius: 5px;
+      margin: 10px 0;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔄 Test Reflection (Pencerminan)</h1>
+
+  <div class="info">
+    <strong>Instruksi:</strong><br>
+    - Segitiga <span style="color: #999;">ABU-ABU</span> = Bentuk asli (original)<br>
+    - Segitiga <span style="color: #667eea;">UNGU</span> = Hasil reflection (cermin)<br>
+    - Garis <span style="color: red;">MERAH</span> = Sumbu X<br>
+    - Garis <span style="color: green;">HIJAU</span> = Sumbu Y<br>
+    - Label <strong>"L"</strong> = Menunjukkan orientasi segitiga
+  </div>
+
+  <div class="status" id="status">Klik tombol untuk melihat reflection</div>
+
+  <canvas id="reflectionCanvas" width="600" height="400"></canvas>
+
+  <div class="controls">
+    <button class="btn" onclick="applyReflection('x')">Mirror X-axis</button>
+    <button class="btn" onclick="applyReflection('y')">Mirror Y-axis</button>
+    <button class="btn" onclick="applyReflection('origin')">Mirror Origin</button>
+    <button class="btn" onclick="applyReflection('diagonal')">Mirror Diagonal</button>
+    <br>
+    <button class="btn btn-secondary" onclick="resetReflection()">Reset</button>
+  </div>
+
+  <div class="info">
+    <strong>Penjelasan Transformasi:</strong><br>
+    <strong>Mirror X-axis:</strong> Memantulkan terhadap sumbu X (horizontal) - y' = -y<br>
+    <strong>Mirror Y-axis:</strong> Memantulkan terhadap sumbu Y (vertikal) - x' = -x<br>
+    <strong>Mirror Origin:</strong> Memantulkan terhadap titik origin (0,0) - x' = -x, y' = -y<br>
+    <strong>Mirror Diagonal:</strong> Memantulkan terhadap garis y=x - tukar x dan y
+  </div>
+
+  <script>
+    const canvas = document.getElementById('reflectionCanvas');
+    const ctx = canvas.getContext('2d');
+    const statusDiv = document.getElementById('status');
+
+    function drawGrid() {
+      // Draw grid
+      ctx.strokeStyle = '#e0e0e0';
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= 600; i += 50) {
+        ctx.beginPath();
+        ctx.moveTo(i, 0);
+        ctx.lineTo(i, 400);
+        ctx.stroke();
+      }
+      for (let i = 0; i <= 400; i += 50) {
+        ctx.beginPath();
+        ctx.moveTo(0, i);
+        ctx.lineTo(600, i);
+        ctx.stroke();
+      }
+
+      // Draw axes
+      ctx.strokeStyle = '#ff0000';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(0, 200);
+      ctx.lineTo(600, 200);
+      ctx.stroke();
+
+      // Label X-axis
+      ctx.fillStyle = '#ff0000';
+      ctx.font = 'bold 12px Arial';
+      ctx.fillText('X-axis', 10, 215);
+
+      ctx.strokeStyle = '#00ff00';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(300, 0);
+      ctx.lineTo(300, 400);
+      ctx.stroke();
+
+      // Label Y-axis
+      ctx.fillStyle = '#00ff00';
+      ctx.fillText('Y-axis', 310, 15);
+    }
+
+    function drawRightTriangle(ctx, fillColor, strokeColor) {
+      // Segitiga siku-siku dengan siku di kiri bawah
+      ctx.beginPath();
+      ctx.moveTo(-50, 50);    // Kiri bawah (siku)
+      ctx.lineTo(50, 50);     // Kanan bawah
+      ctx.lineTo(-50, -50);   // Kiri atas
+      ctx.closePath();
+
+      ctx.fillStyle = fillColor;
+      ctx.fill();
+      ctx.strokeStyle = strokeColor;
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      // Tambahkan label L untuk menunjukkan orientasi
+      ctx.fillStyle = strokeColor;
+      ctx.font = 'bold 20px Arial';
+      ctx.fillText('L', -15, 10);
+    }
+
+    function applyReflection(type) {
+      if (!ctx) {
+        alert('Canvas tidak tersedia!');
+        return;
+      }
+
+      ctx.clearRect(0, 0, 600, 400);
+      drawGrid();
+
+      // Original shape (gray) - segitiga siku-siku
+      ctx.save();
+      ctx.translate(300, 200);
+      ctx.translate(70, -40);  // Offset untuk terlihat jelas
+      drawRightTriangle(ctx, 'rgba(200, 200, 200, 0.5)', '#999');
+      ctx.restore();
+
+      // Reflected shape (purple)
+      ctx.save();
+      ctx.translate(300, 200);
+
+      let reflectionName = '';
+      switch(type) {
+        case 'x':    // Mirror terhadap X-axis
+          ctx.translate(70, -40);
+          ctx.scale(1, -1);
+          reflectionName = 'Mirror X-axis (y\' = -y)';
+          break;
+        case 'y':    // Mirror terhadap Y-axis
+          ctx.translate(70, -40);
+          ctx.scale(-1, 1);
+          reflectionName = 'Mirror Y-axis (x\' = -x)';
+          break;
+        case 'origin': // Mirror terhadap origin
+          ctx.translate(70, -40);
+          ctx.scale(-1, -1);
+          reflectionName = 'Mirror Origin (x\' = -x, y\' = -y)';
+          break;
+        case 'diagonal': // Mirror terhadap y=x
+          ctx.translate(70, -40);
+          ctx.transform(0, 1, 1, 0, 0, 0);
+          reflectionName = 'Mirror Diagonal (x\' = y, y\' = x)';
+          break;
+        default:
+          alert('Tipe reflection tidak valid!');
+          return;
+      }
+
+      drawRightTriangle(ctx, '#667eea', '#000');
+      ctx.restore();
+
+      statusDiv.textContent = `✅ ${reflectionName}`;
+      statusDiv.style.background = '#d4edda';
+      statusDiv.style.color = '#155724';
+      console.log('Reflection applied:', type);
+    }
+
+    function resetReflection() {
+      if (!ctx) {
+        alert('Canvas tidak tersedia!');
+        return;
+      }
+
+      ctx.clearRect(0, 0, 600, 400);
+      drawGrid();
+
+      // Original shape only - segitiga siku-siku
+      ctx.save();
+      ctx.translate(300, 200);
+      ctx.translate(70, -40);
+      drawRightTriangle(ctx, 'rgba(200, 200, 200, 0.5)', '#999');
+      ctx.restore();
+
+      statusDiv.textContent = 'Klik tombol untuk melihat reflection';
+      statusDiv.style.background = '#e0e0e0';
+      statusDiv.style.color = '#000';
+      console.log('Reflection reset');
+    }
+
+    // Initialize on load
+    window.addEventListener('load', () => {
+      resetReflection();
+    });
+  </script>
+</body>
+</html>

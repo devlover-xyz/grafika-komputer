@@ -1,0 +1,1814 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grafika Komputer - Praktikum</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 250px;
+      height: 100vh;
+      background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      overflow-y: auto;
+      z-index: 1000;
+      transition: transform 0.3s;
+    }
+
+    .sidebar.hidden {
+      transform: translateX(-100%);
+    }
+
+    .sidebar-header {
+      text-align: center;
+      padding-bottom: 20px;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+      margin-bottom: 20px;
+    }
+
+    .sidebar-header h1 {
+      font-size: 1.5em;
+      margin-bottom: 5px;
+    }
+
+    .sidebar-header p {
+      font-size: 0.85em;
+      opacity: 0.9;
+    }
+
+    .sidebar-menu {
+      list-style: none;
+    }
+
+    .sidebar-menu li {
+      margin: 8px 0;
+    }
+
+    .sidebar-menu a {
+      color: white;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      padding: 12px 15px;
+      border-radius: 8px;
+      transition: all 0.3s;
+    }
+
+    .sidebar-menu a:hover,
+    .sidebar-menu a.active {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateX(5px);
+    }
+
+    .sidebar-menu .icon {
+      margin-right: 10px;
+      font-size: 1.2em;
+    }
+
+    .sidebar-footer {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      right: 20px;
+      text-align: center;
+      font-size: 0.75em;
+      opacity: 0.7;
+      border-top: 1px solid rgba(255, 255, 255, 0.3);
+      padding-top: 15px;
+    }
+
+    /* Toggle Button */
+    .sidebar-toggle {
+      position: fixed;
+      left: 260px;
+      top: 20px;
+      width: 40px;
+      height: 40px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      z-index: 999;
+      transition: left 0.3s;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .sidebar-toggle.shifted {
+      left: 10px;
+    }
+
+    .sidebar-toggle:hover {
+      background: #5568d3;
+    }
+
+    /* Main Content */
+    .main-content {
+      margin-left: 250px;
+      padding: 40px;
+      min-height: 100vh;
+      background: #f5f5f5;
+      transition: margin-left 0.3s;
+    }
+
+    .main-content.expanded {
+      margin-left: 0;
+    }
+
+    .content-section {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 30px;
+      display: none;
+    }
+
+    .content-section.active {
+      display: block;
+      animation: fadeIn 0.3s;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .content-section h1 {
+      color: #667eea;
+      margin-bottom: 10px;
+      font-size: 2em;
+    }
+
+    .content-section h2 {
+      color: #764ba2;
+      margin-top: 25px;
+      margin-bottom: 15px;
+      border-bottom: 2px solid #667eea;
+      padding-bottom: 10px;
+    }
+
+    .info-box {
+      background: #e3f2fd;
+      padding: 20px;
+      border-left: 4px solid #2196F3;
+      border-radius: 5px;
+      margin: 15px 0;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin: 20px 0;
+    }
+
+    .card {
+      background: #f9f9f9;
+      padding: 20px;
+      border-radius: 8px;
+      border: 2px solid #e0e0e0;
+      transition: all 0.3s;
+    }
+
+    .card:hover {
+      border-color: #667eea;
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .card h3 {
+      color: #667eea;
+      margin-bottom: 10px;
+    }
+
+    .btn {
+      display: inline-block;
+      background: #667eea;
+      color: white;
+      padding: 12px 24px;
+      text-decoration: none;
+      border-radius: 5px;
+      margin: 5px;
+      transition: all 0.3s;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .btn:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background: #f5f5f5;
+      color: #333;
+      border: 2px solid #ddd;
+    }
+
+    canvas {
+      border: 2px solid #ddd;
+      border-radius: 5px;
+      display: block;
+      margin: 20px auto;
+      max-width: 100%;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+
+      .sidebar.visible {
+        transform: translateX(0);
+      }
+
+      .sidebar-toggle {
+        left: 10px;
+      }
+
+      .main-content {
+        margin-left: 0;
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h1>🎨 Grafika Komputer</h1>
+      <p>Praktikum Interaktif</p>
+    </div>
+
+    <ul class="sidebar-menu">
+      <li><a href="#" data-page="home" class="active"><span class="icon">🏠</span> Beranda</a></li>
+      <li><a href="#" data-page="demo-sederhana"><span class="icon">✨</span> Demo Sederhana</a></li>
+      <li><a href="#" data-page="demo-lengkap"><span class="icon">🎯</span> Demo Lengkap</a></li>
+      <li><a href="#" data-page="model-warna"><span class="icon">🎨</span> Model Warna</a></li>
+      <li><a href="#" data-page="transformasi"><span class="icon">🔄</span> Transformasi 2D</a></li>
+      <li><a href="#" data-page="matriks"><span class="icon">📐</span> Matriks</a></li>
+      <li><a href="#" data-page="tutorial"><span class="icon">📖</span> Tutorial</a></li>
+      <li><a href="#" data-page="referensi"><span class="icon">📚</span> Referensi</a></li>
+    </ul>
+
+    <div class="sidebar-footer">
+      <p>Praktikum Grafika Komputer</p>
+      <p>TypeScript Edition</p>
+    </div>
+  </div>
+
+  <!-- Toggle Button -->
+  <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">
+    ☰
+  </button>
+
+  <!-- Main Content -->
+  <div class="main-content" id="mainContent">
+
+    <!-- Home -->
+    <div class="content-section active" id="home">
+      <h1>Selamat Datang! 👋</h1>
+      <p>Praktikum interaktif untuk mempelajari grafika komputer dengan TypeScript.</p>
+
+      <div class="info-box">
+        <strong>📚 Materi yang akan dipelajari:</strong>
+        <ul style="margin-top: 10px;">
+          <li>Representasi gambar: Piksel vs Vektor</li>
+          <li>Model warna: RGB, HSV, CMYK</li>
+          <li>Color blending dan pencahayaan</li>
+          <li>Transformasi 2D: Translasi, Rotasi, Skala</li>
+          <li>Matriks transformasi</li>
+        </ul>
+      </div>
+
+      <h2>Pilih Menu di Sidebar</h2>
+      <div class="card-grid">
+        <div class="card">
+          <h3>✨ Demo Sederhana</h3>
+          <p>Pengenalan dasar piksel vs vektor dengan contoh interaktif yang mudah dipahami.</p>
+          <button class="btn" onclick="navigateTo('demo-sederhana')">Mulai →</button>
+        </div>
+
+        <div class="card">
+          <h3>🎯 Demo Lengkap</h3>
+          <p>Eksplorasi mendalam semua fitur grafika komputer dengan kontrol interaktif lengkap.</p>
+          <button class="btn" onclick="navigateTo('demo-lengkap')">Mulai →</button>
+        </div>
+
+        <div class="card">
+          <h3>🎨 Model Warna</h3>
+          <p>Pelajari RGB, HSV, CMYK dengan visualisasi dan konversi warna interaktif.</p>
+          <button class="btn" onclick="navigateTo('model-warna')">Mulai →</button>
+        </div>
+
+        <div class="card">
+          <h3>🔄 Transformasi 2D</h3>
+          <p>Praktik langsung translasi, rotasi, dan skala dengan visualisasi real-time.</p>
+          <button class="btn" onclick="navigateTo('transformasi')">Mulai →</button>
+        </div>
+      </div>
+
+      <h2>🚀 Quick Start</h2>
+      <ol style="line-height: 2;">
+        <li>Pilih menu dari sidebar sebelah kiri</li>
+        <li>Klik tombol ☰ untuk menyembunyikan/menampilkan sidebar</li>
+        <li>Eksplorasi setiap demo interaktif</li>
+        <li>Baca tutorial untuk pemahaman lebih dalam</li>
+      </ol>
+    </div>
+
+    <!-- Demo Sederhana -->
+    <div class="content-section" id="demo-sederhana">
+      <h1>✨ Demo Sederhana</h1>
+
+      <div class="info-box">
+        <strong>Tujuan:</strong> Memahami perbedaan dasar antara gambar piksel dan gambar vektor
+      </div>
+
+      <h2>1. Gambar Piksel (Raster)</h2>
+      <p>Gambar tersusun dari grid piksel-piksel kecil. Setiap piksel menyimpan warna.</p>
+
+      <canvas id="pixelCanvas1" width="500" height="300"></canvas>
+
+      <div style="text-align: center;">
+        <button class="btn" onclick="demo1DrawPixel()">Gambar Lingkaran</button>
+        <button class="btn" onclick="demo1ClearPixel()">Hapus</button>
+      </div>
+
+      <h2>2. Gambar Vektor</h2>
+      <p>Gambar menggunakan rumus matematis. Bisa diperbesar tanpa kehilangan kualitas.</p>
+
+      <canvas id="vectorCanvas1" width="500" height="300"></canvas>
+
+      <div style="text-align: center;">
+        <button class="btn" onclick="demo1DrawVector()">Gambar Lingkaran</button>
+        <button class="btn" onclick="demo1ClearVector()">Hapus</button>
+      </div>
+
+      <h2>📝 Source Code</h2>
+      <h3>Gambar Piksel:</h3>
+      <pre style="background: #2d2d2d; color: #f8f8f2; padding: 15px; border-radius: 5px; overflow-x: auto;"><code>function demo1DrawPixel() {
+  const canvas = document.getElementById('pixelCanvas1');
+  const ctx = canvas.getContext('2d');
+
+  // Atur warna
+  ctx.fillStyle = '#ff5733';
+
+  // Gambar lingkaran
+  ctx.beginPath();
+  ctx.arc(250, 150, 80, 0, Math.PI * 2);
+  ctx.fill();
+}</code></pre>
+
+      <h3>Gambar Vektor (Konsep):</h3>
+      <pre style="background: #2d2d2d; color: #f8f8f2; padding: 15px; border-radius: 5px; overflow-x: auto;"><code>// Data vektor disimpan sebagai objek
+const circle = {
+  type: 'circle',
+  center: { x: 250, y: 150 },
+  radius: 80,
+  color: { r: 33, g: 150, b: 243, a: 1 }
+};
+
+// Render saat dibutuhkan
+function renderVector(shape) {
+  ctx.fillStyle = `rgba(${shape.color.r}, ${shape.color.g}, ${shape.color.b}, ${shape.color.a})`;
+  ctx.beginPath();
+  ctx.arc(shape.center.x, shape.center.y, shape.radius, 0, Math.PI * 2);
+  ctx.fill();
+}</code></pre>
+
+      <h2>Kesimpulan</h2>
+      <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+        <tr style="background: #667eea; color: white;">
+          <th style="padding: 12px; text-align: left;">Aspek</th>
+          <th style="padding: 12px; text-align: left;">Piksel</th>
+          <th style="padding: 12px; text-align: left;">Vektor</th>
+        </tr>
+        <tr>
+          <td style="padding: 10px; border: 1px solid #ddd;"><strong>Skalabilitas</strong></td>
+          <td style="padding: 10px; border: 1px solid #ddd;">❌ Pixelated saat diperbesar</td>
+          <td style="padding: 10px; border: 1px solid #ddd;">✅ Tetap tajam</td>
+        </tr>
+        <tr>
+          <td style="padding: 10px; border: 1px solid #ddd;"><strong>Ukuran File</strong></td>
+          <td style="padding: 10px; border: 1px solid #ddd;">❌ Besar</td>
+          <td style="padding: 10px; border: 1px solid #ddd;">✅ Kecil</td>
+        </tr>
+        <tr>
+          <td style="padding: 10px; border: 1px solid #ddd;"><strong>Cocok untuk</strong></td>
+          <td style="padding: 10px; border: 1px solid #ddd;">Foto, gambar kompleks</td>
+          <td style="padding: 10px; border: 1px solid #ddd;">Logo, ikon, diagram</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Demo Lengkap -->
+    <div class="content-section" id="demo-lengkap">
+      <h1>🎯 Demo Lengkap</h1>
+
+      <div class="info-box">
+        <strong>Pilih menu dari sidebar untuk melihat demo lengkap:</strong>
+        <ul style="margin-top: 10px;">
+          <li><strong>Model Warna</strong> - RGB, HSV, CMYK dengan slider interaktif</li>
+          <li><strong>Transformasi 2D</strong> - Translasi, Rotasi, Skala dengan visualisasi real-time</li>
+          <li><strong>Matriks</strong> - Matriks transformasi 3×3</li>
+        </ul>
+      </div>
+
+      <h2>Fitur yang Tersedia</h2>
+      <div class="card-grid">
+        <div class="card">
+          <h3>🎨 Model Warna</h3>
+          <p>Visualisasi RGB dengan slider</p>
+          <p>Penjelasan HSV dan CMYK</p>
+          <p>Perbandingan model warna</p>
+          <button class="btn" onclick="navigateTo('model-warna')">Lihat →</button>
+        </div>
+
+        <div class="card">
+          <h3>🔄 Transformasi</h3>
+          <p>Translasi (geser objek)</p>
+          <p>Rotasi (putar objek)</p>
+          <p>Skala (ubah ukuran)</p>
+          <button class="btn" onclick="navigateTo('transformasi')">Lihat →</button>
+        </div>
+
+        <div class="card">
+          <h3>📐 Matriks</h3>
+          <p>Matriks translasi 3×3</p>
+          <p>Matriks rotasi 3×3</p>
+          <p>Matriks skala 3×3</p>
+          <button class="btn" onclick="navigateTo('matriks')">Lihat →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Model Warna -->
+    <div class="content-section" id="model-warna">
+      <h1>🎨 Model Warna</h1>
+
+      <h2>RGB (Red, Green, Blue)</h2>
+      <div class="info-box">
+        Model warna untuk layar digital. Setiap warna adalah kombinasi merah, hijau, dan biru.
+      </div>
+
+      <canvas id="rgbCanvas" width="600" height="200"></canvas>
+
+      <div style="max-width: 500px; margin: 20px auto;">
+        <label>Red: <span id="rValue">255</span></label>
+        <input type="range" id="rSlider" min="0" max="255" value="255" oninput="updateRGB()" style="width: 100%;">
+
+        <label>Green: <span id="gValue">0</span></label>
+        <input type="range" id="gSlider" min="0" max="255" value="0" oninput="updateRGB()" style="width: 100%;">
+
+        <label>Blue: <span id="bValue">0</span></label>
+        <input type="range" id="bSlider" min="0" max="255" value="0" oninput="updateRGB()" style="width: 100%;">
+      </div>
+
+      <h2>📝 Source Code</h2>
+      <pre style="background: #2d2d2d; color: #f8f8f2; padding: 15px; border-radius: 5px; overflow-x: auto;"><code>function updateRGB() {
+  const r = document.getElementById('rSlider').value;
+  const g = document.getElementById('gSlider').value;
+  const b = document.getElementById('bSlider').value;
+
+  // Update display
+  document.getElementById('rValue').textContent = r;
+  document.getElementById('gValue').textContent = g;
+  document.getElementById('bValue').textContent = b;
+
+  // Draw individual colors
+  ctx.fillStyle = `rgb(${r}, 0, 0)`;
+  ctx.fillRect(50, 50, 100, 100);
+
+  ctx.fillStyle = `rgb(0, ${g}, 0)`;
+  ctx.fillRect(200, 50, 100, 100);
+
+  ctx.fillStyle = `rgb(0, 0, ${b})`;
+  ctx.fillRect(350, 50, 100, 100);
+
+  // Draw combined color
+  ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+  ctx.fillRect(500, 50, 80, 100);
+}</code></pre>
+
+      <h2>HSV (Hue, Saturation, Value)</h2>
+      <div class="info-box">
+        Model warna intuitif untuk manusia. Hue = warna dasar, Saturation = intensitas, Value = kecerahan.
+      </div>
+
+      <canvas id="hsvCanvas" width="600" height="250"></canvas>
+
+      <div style="max-width: 500px; margin: 20px auto;">
+        <label>Hue (Warna): <span id="hValue">0</span>°</label>
+        <input type="range" id="hSlider" min="0" max="360" value="0" oninput="updateHSV()" style="width: 100%;">
+
+        <label>Saturation (Intensitas): <span id="sValue">100</span>%</label>
+        <input type="range" id="sSlider" min="0" max="100" value="100" oninput="updateHSV()" style="width: 100%;">
+
+        <label>Value (Kecerahan): <span id="vValue">100</span>%</label>
+        <input type="range" id="vSlider" min="0" max="100" value="100" oninput="updateHSV()" style="width: 100%;">
+      </div>
+
+      <h2>CMYK (Cyan, Magenta, Yellow, Black)</h2>
+      <div class="info-box">
+        Model warna untuk printing. Subtractive color model - warna dihasilkan dari penyerapan cahaya.
+      </div>
+
+      <canvas id="cmykCanvas" width="600" height="250"></canvas>
+
+      <div style="max-width: 500px; margin: 20px auto;">
+        <label>Cyan: <span id="cValue">0</span>%</label>
+        <input type="range" id="cSlider" min="0" max="100" value="0" oninput="updateCMYK()" style="width: 100%;">
+
+        <label>Magenta: <span id="mValue">0</span>%</label>
+        <input type="range" id="mSlider" min="0" max="100" value="0" oninput="updateCMYK()" style="width: 100%;">
+
+        <label>Yellow: <span id="yValue">0</span>%</label>
+        <input type="range" id="ySlider" min="0" max="100" value="0" oninput="updateCMYK()" style="width: 100%;">
+
+        <label>Black (Key): <span id="kValue">0</span>%</label>
+        <input type="range" id="kSlider" min="0" max="100" value="0" oninput="updateCMYK()" style="width: 100%;">
+      </div>
+
+      <h2>📝 Source Code - Konversi Warna</h2>
+      <pre style="background: #2d2d2d; color: #f8f8f2; padding: 15px; border-radius: 5px; overflow-x: auto;"><code>// Konversi HSV ke RGB
+function hsvToRgb(h, s, v) {
+  s /= 100;
+  v /= 100;
+
+  const c = v * s;
+  const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+  const m = v - c;
+
+  let r, g, b;
+  if (h < 60) [r, g, b] = [c, x, 0];
+  else if (h < 120) [r, g, b] = [x, c, 0];
+  else if (h < 180) [r, g, b] = [0, c, x];
+  else if (h < 240) [r, g, b] = [0, x, c];
+  else if (h < 300) [r, g, b] = [x, 0, c];
+  else [r, g, b] = [c, 0, x];
+
+  return {
+    r: Math.round((r + m) * 255),
+    g: Math.round((g + m) * 255),
+    b: Math.round((b + m) * 255)
+  };
+}
+
+// Konversi CMYK ke RGB
+function cmykToRgb(c, m, y, k) {
+  c /= 100;
+  m /= 100;
+  y /= 100;
+  k /= 100;
+
+  const r = 255 * (1 - c) * (1 - k);
+  const g = 255 * (1 - m) * (1 - k);
+  const b = 255 * (1 - y) * (1 - k);
+
+  return {
+    r: Math.round(r),
+    g: Math.round(g),
+    b: Math.round(b)
+  };
+}</code></pre>
+
+      <h2>Perbandingan Model Warna</h2>
+      <div class="card-grid">
+        <div class="card">
+          <h3>RGB</h3>
+          <p><strong>Untuk:</strong> Layar digital</p>
+          <p><strong>Komponen:</strong> Red, Green, Blue</p>
+          <p><strong>Jenis:</strong> Additive</p>
+        </div>
+
+        <div class="card">
+          <h3>HSV</h3>
+          <p><strong>Untuk:</strong> Color picking</p>
+          <p><strong>Komponen:</strong> Hue, Saturation, Value</p>
+          <p><strong>Jenis:</strong> Intuitif</p>
+        </div>
+
+        <div class="card">
+          <h3>CMYK</h3>
+          <p><strong>Untuk:</strong> Printing</p>
+          <p><strong>Komponen:</strong> Cyan, Magenta, Yellow, Black</p>
+          <p><strong>Jenis:</strong> Subtractive</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Transformasi -->
+    <div class="content-section" id="transformasi">
+      <h1>🔄 Transformasi 2D</h1>
+
+      <div class="info-box">
+        <strong>Konsep:</strong> Mengubah posisi, ukuran, atau orientasi objek menggunakan rumus matematis.
+      </div>
+
+      <h2>Jenis Transformasi</h2>
+
+      <h3>1. Translasi (Pergeseran)</h3>
+      <div style="background: #f4f4f4; padding: 10px; border-radius: 5px; margin: 10px 0;">
+        <code>x' = x + dx</code><br>
+        <code>y' = y + dy</code>
+      </div>
+
+      <h3>2. Rotasi (Putaran)</h3>
+      <div style="background: #f4f4f4; padding: 10px; border-radius: 5px; margin: 10px 0;">
+        <code>x' = x × cos(θ) - y × sin(θ)</code><br>
+        <code>y' = x × sin(θ) + y × cos(θ)</code>
+      </div>
+
+      <h3>3. Skala (Perbesaran/Perkecilan)</h3>
+      <div style="background: #f4f4f4; padding: 10px; border-radius: 5px; margin: 10px 0;">
+        <code>x' = x × sx</code><br>
+        <code>y' = y × sy</code>
+      </div>
+
+      <canvas id="transformCanvas" width="600" height="400"></canvas>
+
+      <div style="max-width: 500px; margin: 20px auto;">
+        <label>Translasi X: <span id="txValue">0</span></label>
+        <input type="range" id="txSlider" min="-150" max="150" value="0" oninput="updateTransform()" style="width: 100%;">
+
+        <label>Translasi Y: <span id="tyValue">0</span></label>
+        <input type="range" id="tySlider" min="-100" max="100" value="0" oninput="updateTransform()" style="width: 100%;">
+
+        <label>Rotasi: <span id="rotValue">0</span>°</label>
+        <input type="range" id="rotSlider" min="0" max="360" value="0" oninput="updateTransform()" style="width: 100%;">
+
+        <label>Skala: <span id="scaleValue">1.0</span>x</label>
+        <input type="range" id="scaleSlider" min="0.5" max="2" step="0.1" value="1" oninput="updateTransform()" style="width: 100%;">
+
+        <div style="text-align: center; margin-top: 15px;">
+          <button class="btn" onclick="resetTransform()">Reset</button>
+        </div>
+      </div>
+
+      <h2>📝 Source Code</h2>
+      <pre style="background: #2d2d2d; color: #f8f8f2; padding: 15px; border-radius: 5px; overflow-x: auto;"><code>function updateTransform() {
+  const tx = parseFloat(document.getElementById('txSlider').value);
+  const ty = parseFloat(document.getElementById('tySlider').value);
+  const rot = parseFloat(document.getElementById('rotSlider').value);
+  const scale = parseFloat(document.getElementById('scaleSlider').value);
+
+  ctx.clearRect(0, 0, 600, 400);
+
+  // Original shape (gray)
+  ctx.save();
+  ctx.translate(300, 200);
+  ctx.fillStyle = 'rgba(200, 200, 200, 0.5)';
+  ctx.fillRect(-50, -30, 100, 60);
+  ctx.restore();
+
+  // Transformed shape (purple)
+  ctx.save();
+  ctx.translate(300 + tx, 200 + ty);  // Translasi
+  ctx.rotate((rot * Math.PI) / 180);   // Rotasi
+  ctx.scale(scale, scale);             // Skala
+  ctx.fillStyle = '#667eea';
+  ctx.fillRect(-50, -30, 100, 60);
+  ctx.restore();
+}</code></pre>
+
+      <h2>Transformasi Tambahan</h2>
+
+      <h3>4. Shear (Skewing) - Memiringkan</h3>
+      <div style="background: #f4f4f4; padding: 10px; border-radius: 5px; margin: 10px 0;">
+        <strong>Shear Horizontal:</strong> <code>x' = x + shx × y, y' = y</code><br>
+        <strong>Shear Vertical:</strong> <code>x' = x, y' = y + shy × x</code>
+      </div>
+
+      <canvas id="shearCanvas" width="600" height="400"></canvas>
+
+      <div style="max-width: 500px; margin: 20px auto;">
+        <label>Shear X: <span id="shxValue">0</span></label>
+        <input type="range" id="shxSlider" min="-1" max="1" step="0.1" value="0" oninput="updateShear()" style="width: 100%;">
+
+        <label>Shear Y: <span id="shyValue">0</span></label>
+        <input type="range" id="shySlider" min="-1" max="1" step="0.1" value="0" oninput="updateShear()" style="width: 100%;">
+
+        <div style="text-align: center; margin-top: 15px;">
+          <button class="btn" onclick="resetShear()">Reset</button>
+        </div>
+      </div>
+
+      <h3>5. Reflection (Pencerminan)</h3>
+      <div style="background: #f4f4f4; padding: 10px; border-radius: 5px; margin: 10px 0;">
+        <strong>Terhadap X:</strong> <code>x' = x, y' = -y</code><br>
+        <strong>Terhadap Y:</strong> <code>x' = -x, y' = y</code><br>
+        <strong>Terhadap Origin:</strong> <code>x' = -x, y' = -y</code><br>
+        <strong>Diagonal (y=x):</strong> <code>x' = y, y' = x</code>
+      </div>
+
+      <canvas id="reflectionCanvas" width="600" height="400"></canvas>
+
+      <div style="text-align: center; margin: 20px 0;">
+        <button class="btn" onclick="applyReflection('x')">Mirror X</button>
+        <button class="btn" onclick="applyReflection('y')">Mirror Y</button>
+        <button class="btn" onclick="applyReflection('origin')">Mirror Origin</button>
+        <button class="btn" onclick="applyReflection('diagonal')">Mirror Diagonal</button>
+        <button class="btn btn-secondary" onclick="resetReflection()">Reset</button>
+      </div>
+
+      <h2>📝 Source Code - Transformasi Tambahan</h2>
+      <pre style="background: #2d2d2d; color: #f8f8f2; padding: 15px; border-radius: 5px; overflow-x: auto;"><code>// Shear Transformation
+function updateShear() {
+  const shx = parseFloat(document.getElementById('shxSlider').value);
+  const shy = parseFloat(document.getElementById('shySlider').value);
+
+  ctx.clearRect(0, 0, 600, 400);
+
+  // Original shape (gray)
+  ctx.save();
+  ctx.translate(300, 200);
+  ctx.fillStyle = 'rgba(200, 200, 200, 0.5)';
+  ctx.fillRect(-50, -30, 100, 60);
+  ctx.restore();
+
+  // Sheared shape (purple)
+  ctx.save();
+  ctx.translate(300, 200);
+  ctx.transform(1, shy, shx, 1, 0, 0);  // Shear transformation
+  ctx.fillStyle = '#667eea';
+  ctx.fillRect(-50, -30, 100, 60);
+  ctx.restore();
+}
+
+// Fungsi untuk menggambar segitiga siku-siku
+function drawRightTriangle(ctx, fillColor, strokeColor) {
+  ctx.beginPath();
+  ctx.moveTo(-50, 50);    // Kiri bawah (siku)
+  ctx.lineTo(50, 50);     // Kanan bawah
+  ctx.lineTo(-50, -50);   // Kiri atas
+  ctx.closePath();
+
+  ctx.fillStyle = fillColor;
+  ctx.fill();
+  ctx.strokeStyle = strokeColor;
+  ctx.lineWidth = 3;
+  ctx.stroke();
+
+  // Label L untuk menunjukkan orientasi
+  ctx.fillStyle = strokeColor;
+  ctx.font = 'bold 16px Arial';
+  ctx.fillText('L', -20, 10);
+}
+
+// Reflection Transformation
+function applyReflection(type) {
+  ctx.clearRect(0, 0, 600, 400);
+
+  // Original shape (gray) - segitiga siku-siku
+  ctx.save();
+  ctx.translate(300, 200);
+  ctx.translate(70, -40);
+  drawRightTriangle(ctx, 'rgba(200, 200, 200, 0.5)', '#999');
+  ctx.restore();
+
+  // Reflected shape (purple)
+  ctx.save();
+  ctx.translate(300, 200);
+
+  switch(type) {
+    case 'x':    // Mirror terhadap X-axis
+      ctx.translate(70, -40);
+      ctx.scale(1, -1);
+      break;
+    case 'y':    // Mirror terhadap Y-axis
+      ctx.translate(70, -40);
+      ctx.scale(-1, 1);
+      break;
+    case 'origin': // Mirror terhadap origin
+      ctx.translate(70, -40);
+      ctx.scale(-1, -1);
+      break;
+    case 'diagonal': // Mirror terhadap y=x
+      ctx.translate(70, -40);
+      ctx.transform(0, 1, 1, 0, 0, 0);
+      break;
+  }
+
+  drawRightTriangle(ctx, '#667eea', '#000');
+  ctx.restore();
+}</code></pre>
+    </div>
+
+    <!-- Matriks -->
+    <div class="content-section" id="matriks">
+      <h1>📐 Matriks Transformasi</h1>
+
+      <div class="info-box">
+        <strong>Konsep:</strong> Matriks 3×3 digunakan untuk melakukan transformasi 2D secara efisien.
+        Koordinat homogen (x, y, 1) memungkinkan translasi dapat direpresentasikan dalam matriks.
+      </div>
+
+      <h2>1. Matriks Translasi (Geser)</h2>
+
+      <h3>Formula Matriks:</h3>
+      <pre style="background: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto;">
+[1  0  dx]   [x]   [x + dx]
+[0  1  dy] × [y] = [y + dy]
+[0  0  1 ]   [1]   [  1   ]
+      </pre>
+
+      <h3>Contoh Perhitungan Manual:</h3>
+      <div style="background: #e8f4f8; padding: 15px; border-radius: 5px; margin: 10px 0;">
+        <strong>Geser titik (3, 2) sebesar dx=5, dy=4:</strong>
+        <pre style="margin: 10px 0;">
+[1  0  5]   [3]   [1×3 + 0×2 + 5×1]   [8]
+[0  1  4] × [2] = [0×3 + 1×2 + 4×1] = [6]
+[0  0  1]   [1]   [0×3 + 0×2 + 1×1]   [1]
+
+Hasil: (3, 2) → (8, 6)
+        </pre>
+      </div>
+
+      <canvas id="matrixTranslationCanvas" width="600" height="300"></canvas>
+
+      <div style="max-width: 500px; margin: 20px auto;">
+        <label>dx (geser X): <span id="matDxValue">50</span></label>
+        <input type="range" id="matDxSlider" min="-100" max="100" value="50" oninput="updateMatrixTranslation()" style="width: 100%;">
+
+        <label>dy (geser Y): <span id="matDyValue">30</span></label>
+        <input type="range" id="matDySlider" min="-100" max="100" value="30" oninput="updateMatrixTranslation()" style="width: 100%;">
+
+        <div style="text-align: center; margin-top: 15px;">
+          <button class="btn" onclick="resetMatrixTranslation()">Reset</button>
+        </div>
+      </div>
+
+      <h2>2. Matriks Rotasi (Putar)</h2>
+
+      <h3>Formula Matriks:</h3>
+      <pre style="background: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto;">
+[cos(θ) -sin(θ)  0]   [x]
+[sin(θ)  cos(θ)  0] × [y]
+[  0       0     1]   [1]
+      </pre>
+
+      <h3>Contoh Perhitungan Manual:</h3>
+      <div style="background: #e8f4f8; padding: 15px; border-radius: 5px; margin: 10px 0;">
+        <strong>Putar titik (4, 0) sebesar 90° (π/2 radian):</strong>
+        <pre style="margin: 10px 0;">
+cos(90°) = 0,  sin(90°) = 1
+
+[0  -1  0]   [4]   [0×4 + (-1)×0 + 0×1]   [0]
+[1   0  0] × [0] = [1×4 + 0×0 + 0×1]    = [4]
+[0   0  1]   [1]   [0×4 + 0×0 + 1×1]      [1]
+
+Hasil: (4, 0) → (0, 4)
+        </pre>
+      </div>
+
+      <canvas id="matrixRotationCanvas" width="600" height="300"></canvas>
+
+      <div style="max-width: 500px; margin: 20px auto;">
+        <label>Sudut (θ): <span id="matAngleValue">45</span>°</label>
+        <input type="range" id="matAngleSlider" min="0" max="360" value="45" oninput="updateMatrixRotation()" style="width: 100%;">
+
+        <div style="text-align: center; margin-top: 15px;">
+          <button class="btn" onclick="resetMatrixRotation()">Reset</button>
+        </div>
+      </div>
+
+      <h2>3. Matriks Skala (Ubah Ukuran)</h2>
+
+      <h3>Formula Matriks:</h3>
+      <pre style="background: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto;">
+[sx  0   0]   [x]   [x × sx]
+[0   sy  0] × [y] = [y × sy]
+[0   0   1]   [1]   [   1   ]
+      </pre>
+
+      <h3>Contoh Perhitungan Manual:</h3>
+      <div style="background: #e8f4f8; padding: 15px; border-radius: 5px; margin: 10px 0;">
+        <strong>Perbesar titik (2, 3) dengan sx=2, sy=1.5:</strong>
+        <pre style="margin: 10px 0;">
+[2   0    0]   [2]   [2×2 + 0×3 + 0×1]   [4.0]
+[0   1.5  0] × [3] = [0×2 + 1.5×3 + 0×1] = [4.5]
+[0   0    1]   [1]   [0×2 + 0×3 + 1×1]     [1]
+
+Hasil: (2, 3) → (4, 4.5)
+        </pre>
+      </div>
+
+      <canvas id="matrixScaleCanvas" width="600" height="300"></canvas>
+
+      <div style="max-width: 500px; margin: 20px auto;">
+        <label>sx (skala X): <span id="matSxValue">1.5</span></label>
+        <input type="range" id="matSxSlider" min="0.5" max="3" step="0.1" value="1.5" oninput="updateMatrixScale()" style="width: 100%;">
+
+        <label>sy (skala Y): <span id="matSyValue">1.5</span></label>
+        <input type="range" id="matSySlider" min="0.5" max="3" step="0.1" value="1.5" oninput="updateMatrixScale()" style="width: 100%;">
+
+        <div style="text-align: center; margin-top: 15px;">
+          <button class="btn" onclick="resetMatrixScale()">Reset</button>
+        </div>
+      </div>
+
+      <h2>4. Matriks Shear (Miring)</h2>
+
+      <h3>Formula Matriks Shear X:</h3>
+      <pre style="background: #f4f4f4; padding: 15px; border-radius: 5px; overflow-x: auto;">
+[1   shx  0]   [x]   [x + shx×y]
+[0   1    0] × [y] = [    y    ]
+[0   0    1]   [1]   [    1    ]
+      </pre>
+
+      <h3>Contoh Perhitungan Manual:</h3>
+      <div style="background: #e8f4f8; padding: 15px; border-radius: 5px; margin: 10px 0;">
+        <strong>Shear X pada titik (2, 4) dengan shx=0.5:</strong>
+        <pre style="margin: 10px 0;">
+[1   0.5  0]   [2]   [1×2 + 0.5×4 + 0×1]   [4.0]
+[0   1    0] × [4] = [0×2 + 1×4 + 0×1]    = [4.0]
+[0   0    1]   [1]   [0×2 + 0×4 + 1×1]      [1]
+
+Hasil: (2, 4) → (4, 4)
+        </pre>
+      </div>
+
+      <canvas id="matrixShearCanvas" width="600" height="300"></canvas>
+
+      <div style="max-width: 500px; margin: 20px auto;">
+        <label>shx (shear X): <span id="matShxValue">0.5</span></label>
+        <input type="range" id="matShxSlider" min="-1" max="1" step="0.1" value="0.5" oninput="updateMatrixShear()" style="width: 100%;">
+
+        <div style="text-align: center; margin-top: 15px;">
+          <button class="btn" onclick="resetMatrixShear()">Reset</button>
+        </div>
+      </div>
+
+      <h2>5. Transformasi Komposit (Gabungan)</h2>
+
+      <div class="info-box">
+        <strong>💡 Konsep:</strong> Beberapa transformasi dapat digabungkan dengan perkalian matriks.<br>
+        <strong>Urutan penting:</strong> M_final = M_translate × M_rotate × M_scale<br>
+        Transformasi diterapkan dari kanan ke kiri (scale → rotate → translate)
+      </div>
+
+      <h3>Contoh Perhitungan Manual:</h3>
+      <div style="background: #e8f4f8; padding: 15px; border-radius: 5px; margin: 10px 0;">
+        <strong>Transformasi komposit: Scale(2,2) → Translate(3,1)</strong>
+        <pre style="margin: 10px 0;">
+Titik awal: (1, 2)
+
+1. Scale (2, 2):
+   [2  0  0]   [1]   [2]
+   [0  2  0] × [2] = [4]
+   [0  0  1]   [1]   [1]
+
+2. Translate (3, 1):
+   [1  0  3]   [2]   [5]
+   [0  1  1] × [4] = [5]
+   [0  0  1]   [1]   [1]
+
+Hasil: (1, 2) → (5, 5)
+
+Atau dengan matriks komposit:
+M = M_translate × M_scale
+  = [1  0  3]   [2  0  0]   [2  0  3]
+    [0  1  1] × [0  2  0] = [0  2  1]
+    [0  0  1]   [0  0  1]   [0  0  1]
+
+Verifikasi:
+[2  0  3]   [1]   [5]
+[0  2  1] × [2] = [5]
+[0  0  1]   [1]   [1]  ✓ Sama!
+        </pre>
+      </div>
+
+      <canvas id="matrixCompositeCanvas" width="600" height="400"></canvas>
+
+      <div style="max-width: 500px; margin: 20px auto;">
+        <label><input type="checkbox" id="matEnableScale" checked onchange="updateMatrixComposite()"> Scale</label>
+        <div style="margin-left: 20px;">
+          <label>sx: <span id="matCompSxValue">1.5</span></label>
+          <input type="range" id="matCompSxSlider" min="0.5" max="2" step="0.1" value="1.5" oninput="updateMatrixComposite()" style="width: 100%;">
+        </div>
+
+        <label><input type="checkbox" id="matEnableRotate" checked onchange="updateMatrixComposite()"> Rotate</label>
+        <div style="margin-left: 20px;">
+          <label>angle: <span id="matCompAngleValue">30</span>°</label>
+          <input type="range" id="matCompAngleSlider" min="0" max="360" value="30" oninput="updateMatrixComposite()" style="width: 100%;">
+        </div>
+
+        <label><input type="checkbox" id="matEnableTranslate" checked onchange="updateMatrixComposite()"> Translate</label>
+        <div style="margin-left: 20px;">
+          <label>dx: <span id="matCompDxValue">50</span></label>
+          <input type="range" id="matCompDxSlider" min="-100" max="100" value="50" oninput="updateMatrixComposite()" style="width: 100%;">
+
+          <label>dy: <span id="matCompDyValue">20</span></label>
+          <input type="range" id="matCompDySlider" min="-100" max="100" value="20" oninput="updateMatrixComposite()" style="width: 100%;">
+        </div>
+
+        <div style="text-align: center; margin-top: 15px;">
+          <button class="btn" onclick="resetMatrixComposite()">Reset</button>
+        </div>
+      </div>
+
+      <div id="matrixCalculationResult" style="background: #f4f4f4; padding: 15px; border-radius: 5px; margin: 20px 0; font-family: monospace; font-size: 12px; line-height: 1.6;">
+        Matriks hasil akan ditampilkan di sini...
+      </div>
+
+      <h2>📝 Source Code - Operasi Matriks</h2>
+      <pre style="background: #2d2d2d; color: #f8f8f2; padding: 15px; border-radius: 5px; overflow-x: auto;"><code>// Buat matriks translasi
+function createTranslationMatrix(dx, dy) {
+  return [1, 0, 0, 1, dx, dy];
+  // Format: [a, b, c, d, e, f] = [a c e]
+  //                               [b d f]
+  //                               [0 0 1]
+}
+
+// Buat matriks rotasi
+function createRotationMatrix(angle) {
+  const rad = angle * Math.PI / 180;
+  const cos = Math.cos(rad);
+  const sin = Math.sin(rad);
+  return [cos, sin, -sin, cos, 0, 0];
+}
+
+// Buat matriks scale
+function createScaleMatrix(sx, sy) {
+  return [sx, 0, 0, sy, 0, 0];
+}
+
+// Kalikan dua matriks
+function multiplyMatrices(m1, m2) {
+  const [a1, b1, c1, d1, e1, f1] = m1;
+  const [a2, b2, c2, d2, e2, f2] = m2;
+
+  return [
+    a1*a2 + c1*b2,           // a
+    b1*a2 + d1*b2,           // b
+    a1*c2 + c1*d2,           // c
+    b1*c2 + d1*d2,           // d
+    a1*e2 + c1*f2 + e1,      // e
+    b1*e2 + d1*f2 + f1       // f
+  ];
+}
+
+// Aplikasikan matriks ke titik
+function applyMatrix(point, matrix) {
+  const [a, b, c, d, e, f] = matrix;
+  return {
+    x: a * point.x + c * point.y + e,
+    y: b * point.x + d * point.y + f
+  };
+}</code></pre>
+
+      <h2>🎓 Ringkasan Matriks</h2>
+      <table style="width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px;">
+        <tr style="background: #667eea; color: white;">
+          <th style="padding: 12px; border: 1px solid #ddd;">Transformasi</th>
+          <th style="padding: 12px; border: 1px solid #ddd;">Matriks 3×3</th>
+          <th style="padding: 12px; border: 1px solid #ddd;">Parameter</th>
+        </tr>
+        <tr>
+          <td style="padding: 10px; border: 1px solid #ddd;"><strong>Translasi</strong></td>
+          <td style="padding: 10px; border: 1px solid #ddd; font-family: monospace;">
+            [1  0  dx]<br>
+            [0  1  dy]<br>
+            [0  0  1 ]
+          </td>
+          <td style="padding: 10px; border: 1px solid #ddd;">dx, dy = perpindahan X, Y</td>
+        </tr>
+        <tr>
+          <td style="padding: 10px; border: 1px solid #ddd;"><strong>Rotasi</strong></td>
+          <td style="padding: 10px; border: 1px solid #ddd; font-family: monospace;">
+            [cos(θ) -sin(θ)  0]<br>
+            [sin(θ)  cos(θ)  0]<br>
+            [  0       0     1]
+          </td>
+          <td style="padding: 10px; border: 1px solid #ddd;">θ = sudut (radian)</td>
+        </tr>
+        <tr>
+          <td style="padding: 10px; border: 1px solid #ddd;"><strong>Scale</strong></td>
+          <td style="padding: 10px; border: 1px solid #ddd; font-family: monospace;">
+            [sx  0   0]<br>
+            [0   sy  0]<br>
+            [0   0   1]
+          </td>
+          <td style="padding: 10px; border: 1px solid #ddd;">sx, sy = skala X, Y</td>
+        </tr>
+        <tr>
+          <td style="padding: 10px; border: 1px solid #ddd;"><strong>Shear X</strong></td>
+          <td style="padding: 10px; border: 1px solid #ddd; font-family: monospace;">
+            [1   shx  0]<br>
+            [0   1    0]<br>
+            [0   0    1]
+          </td>
+          <td style="padding: 10px; border: 1px solid #ddd;">shx = faktor shear horizontal</td>
+        </tr>
+        <tr>
+          <td style="padding: 10px; border: 1px solid #ddd;"><strong>Reflection X</strong></td>
+          <td style="padding: 10px; border: 1px solid #ddd; font-family: monospace;">
+            [ 1   0  0]<br>
+            [ 0  -1  0]<br>
+            [ 0   0  1]
+          </td>
+          <td style="padding: 10px; border: 1px solid #ddd;">Mirror terhadap sumbu X</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Tutorial -->
+    <div class="content-section" id="tutorial">
+      <h1>📖 Tutorial</h1>
+
+      <h2>Panduan Belajar</h2>
+
+      <div class="card-grid">
+        <div class="card">
+          <h3>Week 1: Fundamental</h3>
+          <ul style="margin-top: 10px; line-height: 1.8;">
+            <li>Piksel vs Vektor</li>
+            <li>Sistem Koordinat 2D</li>
+            <li>Model Warna RGB</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>Week 2: Implementation</h3>
+          <ul style="margin-top: 10px; line-height: 1.8;">
+            <li>Drawing dengan Canvas API</li>
+            <li>Transformasi 2D</li>
+            <li>Color Blending</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>Week 3: Advanced</h3>
+          <ul style="margin-top: 10px; line-height: 1.8;">
+            <li>Matriks Transformasi</li>
+            <li>Pencahayaan Dasar</li>
+            <li>Mini Project</li>
+          </ul>
+        </div>
+      </div>
+
+      <h2>File Tutorial</h2>
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="tutorial-lengkap.html" class="btn" style="font-size: 16px;">Buka Tutorial Lengkap →</a>
+        <a href="panduan-cepat.html" class="btn btn-secondary" style="font-size: 16px;">Panduan Cepat →</a>
+      </div>
+    </div>
+
+    <!-- Referensi -->
+    <div class="content-section" id="referensi">
+      <h1>📚 Referensi</h1>
+
+      <h2>File-File Proyek</h2>
+
+      <h3>File Utama</h3>
+      <ul style="line-height: 2;">
+        <li><strong>index.html</strong> (file ini) - Aplikasi utama dengan sidebar</li>
+        <li><a href="tutorial-lengkap.html">tutorial-lengkap.html</a> - Tutorial interaktif lengkap</li>
+        <li><a href="panduan-cepat.html">panduan-cepat.html</a> - Quick start 5 menit</li>
+      </ul>
+
+      <h3>Dokumentasi</h3>
+      <ul style="line-height: 2;">
+        <li><a href="README.md">README.md</a> - Dokumentasi lengkap dengan API</li>
+        <li><a href="TUTORIAL.md">TUTORIAL.md</a> - Tutorial step-by-step</li>
+        <li><a href="MULAI-DISINI.md">MULAI-DISINI.md</a> - Panduan memulai</li>
+      </ul>
+
+      <h3>Source Code</h3>
+      <ul style="line-height: 2;">
+        <li>src/types.ts - Definisi tipe data</li>
+        <li>src/coordinate-system.ts - Sistem koordinat 2D</li>
+        <li>src/pixel-image.ts - Gambar piksel</li>
+        <li>src/vector-image.ts - Gambar vektor</li>
+        <li>src/demo.ts - Kode demo</li>
+      </ul>
+
+      <h2>Setup Proyek</h2>
+      <pre style="background: #2d2d2d; color: #f8f8f2; padding: 20px; border-radius: 5px; overflow-x: auto;">
+# Install dependencies
+npm install
+
+# Build TypeScript
+npm run build
+
+# Run server
+npm run serve
+
+# Access: http://localhost:8080
+      </pre>
+    </div>
+
+  </div>
+
+  <script src="dist/tutorial-demo.js"></script>
+  <script>
+    // Navigation
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const toggle = document.getElementById('sidebarToggle');
+      const mainContent = document.getElementById('mainContent');
+
+      sidebar.classList.toggle('hidden');
+      toggle.classList.toggle('shifted');
+      mainContent.classList.toggle('expanded');
+    }
+
+    function navigateTo(page) {
+      // Hide all sections
+      document.querySelectorAll('.content-section').forEach(section => {
+        section.classList.remove('active');
+      });
+
+      // Show selected section
+      const targetSection = document.getElementById(page);
+      if (targetSection) {
+        targetSection.classList.add('active');
+      }
+
+      // Update active menu
+      document.querySelectorAll('.sidebar-menu a').forEach(link => {
+        link.classList.remove('active');
+      });
+
+      const activeLink = document.querySelector(`[data-page="${page}"]`);
+      if (activeLink) {
+        activeLink.classList.add('active');
+      }
+
+      // Scroll to top
+      window.scrollTo(0, 0);
+    }
+
+    // Sidebar menu clicks
+    document.querySelectorAll('.sidebar-menu a').forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const page = this.getAttribute('data-page');
+        navigateTo(page);
+      });
+    });
+
+    // Demo 1 Functions
+    function demo1DrawPixel() {
+      const canvas = document.getElementById('pixelCanvas1');
+      const ctx = canvas?.getContext('2d');
+      if (!ctx) return;
+
+      ctx.fillStyle = '#ff5733';
+      ctx.beginPath();
+      ctx.arc(250, 150, 80, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function demo1ClearPixel() {
+      const canvas = document.getElementById('pixelCanvas1');
+      const ctx = canvas?.getContext('2d');
+      if (!ctx) return;
+      ctx.clearRect(0, 0, 500, 300);
+    }
+
+    function demo1DrawVector() {
+      const canvas = document.getElementById('vectorCanvas1');
+      const ctx = canvas?.getContext('2d');
+      if (!ctx) return;
+
+      ctx.fillStyle = '#2196F3';
+      ctx.beginPath();
+      ctx.arc(250, 150, 80, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function demo1ClearVector() {
+      const canvas = document.getElementById('vectorCanvas1');
+      const ctx = canvas?.getContext('2d');
+      if (!ctx) return;
+      ctx.clearRect(0, 0, 500, 300);
+    }
+
+    // Color Model Functions
+    function hsvToRgb(h, s, v) {
+      s /= 100;
+      v /= 100;
+
+      const c = v * s;
+      const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+      const m = v - c;
+
+      let r, g, b;
+      if (h < 60) {
+        [r, g, b] = [c, x, 0];
+      } else if (h < 120) {
+        [r, g, b] = [x, c, 0];
+      } else if (h < 180) {
+        [r, g, b] = [0, c, x];
+      } else if (h < 240) {
+        [r, g, b] = [0, x, c];
+      } else if (h < 300) {
+        [r, g, b] = [x, 0, c];
+      } else {
+        [r, g, b] = [c, 0, x];
+      }
+
+      return {
+        r: Math.round((r + m) * 255),
+        g: Math.round((g + m) * 255),
+        b: Math.round((b + m) * 255)
+      };
+    }
+
+    function cmykToRgb(c, m, y, k) {
+      c /= 100;
+      m /= 100;
+      y /= 100;
+      k /= 100;
+
+      const r = 255 * (1 - c) * (1 - k);
+      const g = 255 * (1 - m) * (1 - k);
+      const b = 255 * (1 - y) * (1 - k);
+
+      return {
+        r: Math.round(r),
+        g: Math.round(g),
+        b: Math.round(b)
+      };
+    }
+
+    function updateHSV() {
+      const canvas = document.getElementById('hsvCanvas');
+      if (!canvas) return;
+
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      const h = parseFloat(document.getElementById('hSlider').value);
+      const s = parseFloat(document.getElementById('sSlider').value);
+      const v = parseFloat(document.getElementById('vSlider').value);
+
+      document.getElementById('hValue').textContent = h;
+      document.getElementById('sValue').textContent = s;
+      document.getElementById('vValue').textContent = v;
+
+      ctx.clearRect(0, 0, 600, 250);
+
+      // Draw hue spectrum (rainbow)
+      for (let i = 0; i < 360; i++) {
+        const rgb = hsvToRgb(i, 100, 100);
+        ctx.fillStyle = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+        ctx.fillRect(50 + i * 0.8, 30, 3, 30);
+      }
+
+      ctx.fillStyle = '#000';
+      ctx.font = '12px Arial';
+      ctx.fillText('Hue Spectrum (0° - 360°)', 120, 75);
+
+      // Draw saturation gradient
+      for (let i = 0; i <= 100; i++) {
+        const rgb = hsvToRgb(h, i, 100);
+        ctx.fillStyle = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+        ctx.fillRect(50 + i * 2.88, 90, 3, 30);
+      }
+
+      ctx.fillText('Saturation (0% - 100%)', 120, 135);
+
+      // Draw value gradient
+      for (let i = 0; i <= 100; i++) {
+        const rgb = hsvToRgb(h, 100, i);
+        ctx.fillStyle = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+        ctx.fillRect(50 + i * 2.88, 150, 3, 30);
+      }
+
+      ctx.fillText('Value (0% - 100%)', 120, 195);
+
+      // Draw current color
+      const currentRgb = hsvToRgb(h, s, v);
+      ctx.fillStyle = `rgb(${currentRgb.r}, ${currentRgb.g}, ${currentRgb.b})`;
+      ctx.fillRect(430, 30, 120, 150);
+
+      ctx.strokeStyle = '#000';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(430, 30, 120, 150);
+
+      // Labels
+      ctx.fillStyle = '#000';
+      ctx.font = 'bold 14px Arial';
+      ctx.fillText('Current Color', 445, 200);
+      ctx.font = '12px Arial';
+      ctx.fillText(`HSV(${h}, ${s}, ${v})`, 445, 220);
+      ctx.fillText(`RGB(${currentRgb.r}, ${currentRgb.g}, ${currentRgb.b})`, 445, 235);
+    }
+
+    function updateCMYK() {
+      const canvas = document.getElementById('cmykCanvas');
+      if (!canvas) return;
+
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      const c = parseFloat(document.getElementById('cSlider').value);
+      const m = parseFloat(document.getElementById('mSlider').value);
+      const y = parseFloat(document.getElementById('ySlider').value);
+      const k = parseFloat(document.getElementById('kSlider').value);
+
+      document.getElementById('cValue').textContent = c;
+      document.getElementById('mValue').textContent = m;
+      document.getElementById('yValue').textContent = y;
+      document.getElementById('kValue').textContent = k;
+
+      ctx.clearRect(0, 0, 600, 250);
+
+      // Individual CMYK components
+      const cyan = cmykToRgb(100, 0, 0, 0);
+      ctx.fillStyle = `rgb(${cyan.r}, ${cyan.g}, ${cyan.b})`;
+      ctx.fillRect(50, 50, 80, 80);
+      ctx.strokeStyle = '#000';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(50, 50, 80, 80);
+      ctx.fillStyle = '#000';
+      ctx.font = 'bold 12px Arial';
+      ctx.fillText('Cyan', 70, 145);
+
+      const magenta = cmykToRgb(0, 100, 0, 0);
+      ctx.fillStyle = `rgb(${magenta.r}, ${magenta.g}, ${magenta.b})`;
+      ctx.fillRect(150, 50, 80, 80);
+      ctx.strokeRect(150, 50, 80, 80);
+      ctx.fillStyle = '#000';
+      ctx.fillText('Magenta', 160, 145);
+
+      const yellow = cmykToRgb(0, 0, 100, 0);
+      ctx.fillStyle = `rgb(${yellow.r}, ${yellow.g}, ${yellow.b})`;
+      ctx.fillRect(250, 50, 80, 80);
+      ctx.strokeRect(250, 50, 80, 80);
+      ctx.fillStyle = '#000';
+      ctx.fillText('Yellow', 270, 145);
+
+      const black = cmykToRgb(0, 0, 0, 100);
+      ctx.fillStyle = `rgb(${black.r}, ${black.g}, ${black.b})`;
+      ctx.fillRect(350, 50, 80, 80);
+      ctx.strokeRect(350, 50, 80, 80);
+      ctx.fillStyle = '#000';
+      ctx.fillText('Black', 370, 145);
+
+      // Combined color
+      const combined = cmykToRgb(c, m, y, k);
+      ctx.fillStyle = `rgb(${combined.r}, ${combined.g}, ${combined.b})`;
+      ctx.fillRect(460, 30, 120, 120);
+      ctx.strokeRect(460, 30, 120, 120);
+
+      // Labels
+      ctx.fillStyle = '#000';
+      ctx.font = 'bold 14px Arial';
+      ctx.fillText('Combined', 485, 170);
+      ctx.font = '12px Arial';
+      ctx.fillText(`CMYK(${c}, ${m}, ${y}, ${k})`, 465, 190);
+      ctx.fillText(`RGB(${combined.r}, ${combined.g}, ${combined.b})`, 465, 205);
+
+      // Info text
+      ctx.font = '11px Arial';
+      ctx.fillText('Note: CMYK adalah subtractive (printing)', 50, 230);
+      ctx.fillText('Nilai tinggi = lebih gelap', 50, 245);
+    }
+
+    // Shear Transformation
+    function updateShear() {
+      const canvas = document.getElementById('shearCanvas');
+      const ctx = canvas?.getContext('2d');
+      if (!ctx) return;
+
+      const shx = parseFloat(document.getElementById('shxSlider').value);
+      const shy = parseFloat(document.getElementById('shySlider').value);
+
+      document.getElementById('shxValue').textContent = shx;
+      document.getElementById('shyValue').textContent = shy;
+
+      ctx.clearRect(0, 0, 600, 400);
+
+      // Draw grid with numbers
+      const width = 600;
+      const height = 400;
+      const centerX = 300;
+      const centerY = 200;
+      const gridSize = 50;
+
+      // Draw grid lines
+      ctx.strokeStyle = '#e0e0e0';
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= width; i += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(i, 0);
+        ctx.lineTo(i, height);
+        ctx.stroke();
+      }
+      for (let i = 0; i <= height; i += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(0, i);
+        ctx.lineTo(width, i);
+        ctx.stroke();
+      }
+
+      // Draw grid numbers
+      ctx.fillStyle = '#999';
+      ctx.font = '10px Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+
+      // X-axis numbers
+      for (let i = 0; i <= width; i += gridSize) {
+        const xCoord = i - centerX;
+        if (xCoord !== 0) {
+          ctx.fillText(xCoord.toString(), i, centerY + 5);
+        }
+      }
+
+      // Y-axis numbers
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'middle';
+      for (let i = 0; i <= height; i += gridSize) {
+        const yCoord = centerY - i;
+        if (yCoord !== 0) {
+          ctx.fillText(yCoord.toString(), centerX - 5, i);
+        }
+      }
+
+      // Draw axes
+      ctx.strokeStyle = '#ff0000';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(0, centerY);
+      ctx.lineTo(width, centerY);
+      ctx.stroke();
+
+      ctx.strokeStyle = '#00ff00';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(centerX, 0);
+      ctx.lineTo(centerX, height);
+      ctx.stroke();
+
+      // Origin label
+      ctx.fillStyle = '#000';
+      ctx.font = 'bold 11px Arial';
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'bottom';
+      ctx.fillText('0', centerX - 5, centerY - 5);
+
+      // Original shape (gray)
+      ctx.save();
+      ctx.translate(300, 200);
+      ctx.fillStyle = 'rgba(200, 200, 200, 0.5)';
+      ctx.fillRect(-50, -30, 100, 60);
+      ctx.strokeStyle = '#999';
+      ctx.strokeRect(-50, -30, 100, 60);
+      ctx.restore();
+
+      // Sheared shape (purple)
+      ctx.save();
+      ctx.translate(300, 200);
+      ctx.transform(1, shy, shx, 1, 0, 0);  // Shear transformation
+      ctx.fillStyle = '#667eea';
+      ctx.fillRect(-50, -30, 100, 60);
+      ctx.strokeStyle = '#000';
+      ctx.strokeRect(-50, -30, 100, 60);
+      ctx.restore();
+    }
+
+    function resetShear() {
+      document.getElementById('shxSlider').value = 0;
+      document.getElementById('shySlider').value = 0;
+      updateShear();
+    }
+
+    // Reflection Transformation
+    function drawReflectionGrid(ctx) {
+      const width = 600;
+      const height = 400;
+      const centerX = 300;
+      const centerY = 200;
+      const gridSize = 50;
+
+      // Draw grid lines
+      ctx.strokeStyle = '#e0e0e0';
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= width; i += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(i, 0);
+        ctx.lineTo(i, height);
+        ctx.stroke();
+      }
+      for (let i = 0; i <= height; i += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(0, i);
+        ctx.lineTo(width, i);
+        ctx.stroke();
+      }
+
+      // Draw grid numbers
+      ctx.fillStyle = '#999';
+      ctx.font = '10px Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+
+      // X-axis numbers
+      for (let i = 0; i <= width; i += gridSize) {
+        const xCoord = i - centerX;
+        if (xCoord !== 0) {
+          ctx.fillText(xCoord.toString(), i, centerY + 5);
+        }
+      }
+
+      // Y-axis numbers
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'middle';
+      for (let i = 0; i <= height; i += gridSize) {
+        const yCoord = centerY - i;
+        if (yCoord !== 0) {
+          ctx.fillText(yCoord.toString(), centerX - 5, i);
+        }
+      }
+
+      // Draw axes
+      ctx.strokeStyle = '#ff0000';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(0, centerY);
+      ctx.lineTo(width, centerY);
+      ctx.stroke();
+
+      // X-axis label
+      ctx.fillStyle = '#ff0000';
+      ctx.font = 'bold 11px Arial';
+      ctx.textAlign = 'left';
+      ctx.fillText('X', width - 15, centerY + 15);
+
+      ctx.strokeStyle = '#00ff00';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(centerX, 0);
+      ctx.lineTo(centerX, height);
+      ctx.stroke();
+
+      // Y-axis label
+      ctx.fillStyle = '#00ff00';
+      ctx.textAlign = 'center';
+      ctx.fillText('Y', centerX + 15, 10);
+
+      // Origin label
+      ctx.fillStyle = '#000';
+      ctx.font = 'bold 11px Arial';
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'bottom';
+      ctx.fillText('0', centerX - 5, centerY - 5);
+    }
+
+    function drawRightTriangle(ctx, fillColor, strokeColor) {
+      // Segitiga siku-siku dengan siku di kiri bawah
+      ctx.beginPath();
+      ctx.moveTo(-50, 50);    // Kiri bawah (siku)
+      ctx.lineTo(50, 50);     // Kanan bawah
+      ctx.lineTo(-50, -50);   // Kiri atas
+      ctx.closePath();
+
+      ctx.fillStyle = fillColor;
+      ctx.fill();
+      ctx.strokeStyle = strokeColor;
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      // Tambahkan label L untuk menunjukkan orientasi
+      ctx.fillStyle = strokeColor;
+      ctx.font = 'bold 16px Arial';
+      ctx.fillText('L', -20, 10);
+    }
+
+    function applyReflection(type) {
+      const canvas = document.getElementById('reflectionCanvas');
+      if (!canvas) {
+        console.error('Canvas reflectionCanvas tidak ditemukan');
+        return;
+      }
+
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        console.error('Context 2D tidak tersedia');
+        return;
+      }
+
+      ctx.clearRect(0, 0, 600, 400);
+      drawReflectionGrid(ctx);
+
+      // Original shape (gray) - segitiga siku-siku
+      ctx.save();
+      ctx.translate(300, 200);
+      ctx.translate(70, -40);  // Offset untuk terlihat jelas
+      drawRightTriangle(ctx, 'rgba(200, 200, 200, 0.5)', '#999');
+      ctx.restore();
+
+      // Reflected shape (purple)
+      ctx.save();
+      ctx.translate(300, 200);
+
+      switch(type) {
+        case 'x':    // Mirror terhadap X-axis
+          ctx.translate(70, -40);
+          ctx.scale(1, -1);
+          break;
+        case 'y':    // Mirror terhadap Y-axis
+          ctx.translate(70, -40);
+          ctx.scale(-1, 1);
+          break;
+        case 'origin': // Mirror terhadap origin
+          ctx.translate(70, -40);
+          ctx.scale(-1, -1);
+          break;
+        case 'diagonal': // Mirror terhadap y=x
+          ctx.translate(70, -40);
+          ctx.transform(0, 1, 1, 0, 0, 0);
+          break;
+        default:
+          console.error('Tipe reflection tidak valid:', type);
+      }
+
+      drawRightTriangle(ctx, '#667eea', '#000');
+      ctx.restore();
+
+      console.log('Reflection applied:', type);
+    }
+
+    function resetReflection() {
+      const canvas = document.getElementById('reflectionCanvas');
+      if (!canvas) {
+        console.error('Canvas reflectionCanvas tidak ditemukan');
+        return;
+      }
+
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        console.error('Context 2D tidak tersedia');
+        return;
+      }
+
+      ctx.clearRect(0, 0, 600, 400);
+      drawReflectionGrid(ctx);
+
+      // Original shape only - segitiga siku-siku
+      ctx.save();
+      ctx.translate(300, 200);
+      ctx.translate(70, -40);
+      drawRightTriangle(ctx, 'rgba(200, 200, 200, 0.5)', '#999');
+      ctx.restore();
+
+      console.log('Reflection reset');
+    }
+
+    // Initialize
+    window.addEventListener('load', () => {
+      if (typeof updateRGB === 'function') updateRGB();
+      if (typeof updateHSV === 'function') updateHSV();
+      if (typeof updateCMYK === 'function') updateCMYK();
+      if (typeof updateTransform === 'function') updateTransform();
+      if (typeof updateShear === 'function') updateShear();
+      if (typeof resetReflection === 'function') resetReflection();
+
+      // Matrix demos
+      if (typeof updateMatrixTranslation === 'function') updateMatrixTranslation();
+      if (typeof updateMatrixRotation === 'function') updateMatrixRotation();
+      if (typeof updateMatrixScale === 'function') updateMatrixScale();
+      if (typeof updateMatrixShear === 'function') updateMatrixShear();
+      if (typeof updateMatrixComposite === 'function') updateMatrixComposite();
+    });
+  </script>
+
+  <!-- Matrix Demos -->
+  <script src="dist/matrix-demos.js"></script>
+</body>
+</html>

@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tutorial Lengkap - Grafika Komputer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f5f5f5;
+    }
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    .nav {
+      background: #333;
+      padding: 15px;
+      text-align: center;
+    }
+    .nav a {
+      color: white;
+      text-decoration: none;
+      margin: 0 15px;
+      padding: 8px 16px;
+      background: #555;
+      border-radius: 5px;
+    }
+    .nav a:hover {
+      background: #667eea;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .section {
+      background: white;
+      padding: 30px;
+      margin: 20px 0;
+      border-radius: 8px;
+    }
+    h2 {
+      color: #667eea;
+      border-bottom: 3px solid #667eea;
+      padding-bottom: 10px;
+    }
+    h3 {
+      color: #764ba2;
+    }
+    canvas {
+      border: 2px solid #ddd;
+      border-radius: 5px;
+      display: block;
+      margin: 15px auto;
+      max-width: 100%;
+    }
+    button {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      margin: 5px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #5568d3;
+    }
+    .info {
+      background: #e3f2fd;
+      padding: 15px;
+      border-left: 4px solid #2196F3;
+      border-radius: 4px;
+      margin: 15px 0;
+    }
+    .formula {
+      background: #f4f4f4;
+      padding: 10px;
+      border-radius: 5px;
+      font-family: monospace;
+      margin: 10px 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 15px 0;
+    }
+    table th,
+    table td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: left;
+    }
+    table th {
+      background: #667eea;
+      color: white;
+    }
+    input[type="range"] {
+      width: 100%;
+      margin: 10px 0;
+    }
+    .slider-label {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 5px;
+      font-size: 14px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>📖 Tutorial Lengkap - Grafika Komputer</h1>
+    <p>Materi Lengkap dengan Demo Interaktif</p>
+  </div>
+
+  <div class="nav">
+    <a href="mulai-disini.html">🏠 Beranda</a>
+    <a href="demo-sederhana.html">✨ Demo Sederhana</a>
+    <a href="demo-lengkap.html">🎯 Demo Lengkap</a>
+  </div>
+
+  <div class="container">
+    <!-- Daftar Isi -->
+    <div class="section">
+      <h2>📑 Daftar Isi</h2>
+      <ol>
+        <li><a href="#model-warna">Model Warna (RGB, CMYK, HSV)</a></li>
+        <li><a href="#blending">Color Blending</a></li>
+        <li><a href="#pencahayaan">Dasar Pencahayaan</a></li>
+        <li><a href="#transformasi">Transformasi 2D</a></li>
+        <li><a href="#matriks">Matriks Transformasi</a></li>
+      </ol>
+    </div>
+
+    <!-- 1. Model Warna -->
+    <div class="section" id="model-warna">
+      <h2>1. Model Warna</h2>
+
+      <h3>1.1 RGB (Red, Green, Blue)</h3>
+      <div class="info">
+        <strong>Penggunaan:</strong> Monitor, TV, layar digital (additive color model)
+      </div>
+
+      <p>Model warna yang paling umum di komputer grafis. Setiap warna adalah kombinasi dari Red, Green, dan Blue.</p>
+
+      <div class="formula">
+        R: 0-255 (Red)<br>
+        G: 0-255 (Green)<br>
+        B: 0-255 (Blue)<br>
+        A: 0-1 (Alpha/Transparansi)
+      </div>
+
+      <canvas id="rgbCanvas" width="600" height="200"></canvas>
+
+      <div>
+        <label>Red: <span id="rValue">255</span></label>
+        <input type="range" id="rSlider" min="0" max="255" value="255" oninput="updateRGB()">
+
+        <label>Green: <span id="gValue">0</span></label>
+        <input type="range" id="gSlider" min="0" max="255" value="0" oninput="updateRGB()">
+
+        <label>Blue: <span id="bValue">0</span></label>
+        <input type="range" id="bSlider" min="0" max="255" value="0" oninput="updateRGB()">
+      </div>
+
+      <h3>1.2 HSV (Hue, Saturation, Value)</h3>
+      <div class="info">
+        <strong>Penggunaan:</strong> Color picking, image editing (lebih intuitif untuk manusia)
+      </div>
+
+      <div class="formula">
+        H (Hue): 0-360° (warna)<br>
+        S (Saturation): 0-100% (intensitas warna)<br>
+        V (Value): 0-100% (kecerahan)
+      </div>
+
+      <canvas id="hsvCanvas" width="600" height="200"></canvas>
+
+      <div>
+        <label>Hue: <span id="hValue">0</span>°</label>
+        <input type="range" id="hSlider" min="0" max="360" value="0" oninput="updateHSV()">
+
+        <label>Saturation: <span id="sValue">100</span>%</label>
+        <input type="range" id="sSlider" min="0" max="100" value="100" oninput="updateHSV()">
+
+        <label>Value: <span id="vValue">100</span>%</label>
+        <input type="range" id="vSlider" min="0" max="100" value="100" oninput="updateHSV()">
+      </div>
+
+      <h3>1.3 CMYK (Cyan, Magenta, Yellow, Black)</h3>
+      <div class="info">
+        <strong>Penggunaan:</strong> Printing (subtractive color model)
+      </div>
+
+      <table>
+        <tr>
+          <th>Model</th>
+          <th>Komponen</th>
+          <th>Penggunaan</th>
+          <th>Jenis</th>
+        </tr>
+        <tr>
+          <td>RGB</td>
+          <td>Red, Green, Blue</td>
+          <td>Monitor, layar digital</td>
+          <td>Additive</td>
+        </tr>
+        <tr>
+          <td>HSV</td>
+          <td>Hue, Saturation, Value</td>
+          <td>Color picker, editing</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>CMYK</td>
+          <td>Cyan, Magenta, Yellow, Black</td>
+          <td>Printing</td>
+          <td>Subtractive</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- 2. Blending -->
+    <div class="section" id="blending">
+      <h2>2. Color Blending</h2>
+
+      <div class="info">
+        <strong>Konsep:</strong> Menggabungkan dua warna untuk menghasilkan warna baru
+      </div>
+
+      <h3>2.1 Alpha Blending</h3>
+      <p>Teknik paling umum untuk transparansi:</p>
+
+      <div class="formula">
+        Result = (Source × Alpha) + (Destination × (1 - Alpha))
+      </div>
+
+      <canvas id="blendCanvas" width="600" height="300"></canvas>
+
+      <div>
+        <label>Alpha: <span id="alphaValue">0.5</span></label>
+        <input type="range" id="alphaSlider" min="0" max="1" step="0.1" value="0.5" oninput="updateBlend()">
+
+        <button onclick="changeBlendMode('normal')">Normal</button>
+        <button onclick="changeBlendMode('multiply')">Multiply</button>
+        <button onclick="changeBlendMode('screen')">Screen</button>
+        <button onclick="changeBlendMode('overlay')">Overlay</button>
+      </div>
+
+      <h3>2.2 Blend Modes</h3>
+      <table>
+        <tr>
+          <th>Mode</th>
+          <th>Rumus</th>
+          <th>Hasil</th>
+        </tr>
+        <tr>
+          <td>Normal</td>
+          <td>src × alpha + dst × (1-alpha)</td>
+          <td>Standar transparansi</td>
+        </tr>
+        <tr>
+          <td>Multiply</td>
+          <td>src × dst</td>
+          <td>Gelap (seperti menumpuk cat)</td>
+        </tr>
+        <tr>
+          <td>Screen</td>
+          <td>1 - (1-src) × (1-dst)</td>
+          <td>Terang (kebalikan multiply)</td>
+        </tr>
+        <tr>
+          <td>Overlay</td>
+          <td>Kombinasi multiply & screen</td>
+          <td>Kontras tinggi</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- 3. Pencahayaan -->
+    <div class="section" id="pencahayaan">
+      <h2>3. Dasar Pencahayaan</h2>
+
+      <div class="info">
+        <strong>Konsep:</strong> Simulasi cahaya untuk memberi kesan 3D pada objek 2D
+      </div>
+
+      <h3>3.1 Komponen Cahaya</h3>
+
+      <ol>
+        <li><strong>Ambient Light:</strong> Cahaya merata dari semua arah</li>
+        <li><strong>Diffuse Light:</strong> Cahaya yang menyebar saat mengenai permukaan</li>
+        <li><strong>Specular Light:</strong> Pantulan cahaya (highlight)</li>
+      </ol>
+
+      <canvas id="lightCanvas" width="600" height="400"></canvas>
+
+      <div>
+        <label>Ambient: <span id="ambientValue">0.2</span></label>
+        <input type="range" id="ambientSlider" min="0" max="1" step="0.1" value="0.2" oninput="updateLight()">
+
+        <label>Diffuse: <span id="diffuseValue">0.6</span></label>
+        <input type="range" id="diffuseSlider" min="0" max="1" step="0.1" value="0.6" oninput="updateLight()">
+
+        <label>Specular: <span id="specularValue">0.8</span></label>
+        <input type="range" id="specularSlider" min="0" max="1" step="0.1" value="0.8" oninput="updateLight()">
+
+        <label>Posisi Cahaya X: <span id="lightXValue">300</span></label>
+        <input type="range" id="lightXSlider" min="0" max="600" value="300" oninput="updateLight()">
+      </div>
+
+      <div class="formula">
+        Total Light = Ambient + Diffuse + Specular<br>
+        Final Color = Object Color × Total Light
+      </div>
+    </div>
+
+    <!-- 4. Transformasi 2D -->
+    <div class="section" id="transformasi">
+      <h2>4. Transformasi 2D</h2>
+
+      <div class="info">
+        <strong>Konsep:</strong> Mengubah posisi, ukuran, atau orientasi objek
+      </div>
+
+      <h3>4.1 Translasi (Translation)</h3>
+      <p>Menggeser objek ke posisi baru:</p>
+      <div class="formula">
+        x' = x + dx<br>
+        y' = y + dy
+      </div>
+
+      <h3>4.2 Rotasi (Rotation)</h3>
+      <p>Memutar objek terhadap titik pusat:</p>
+      <div class="formula">
+        x' = x × cos(θ) - y × sin(θ)<br>
+        y' = x × sin(θ) + y × cos(θ)
+      </div>
+
+      <h3>4.3 Skala (Scaling)</h3>
+      <p>Memperbesar atau memperkecil objek:</p>
+      <div class="formula">
+        x' = x × sx<br>
+        y' = y × sy
+      </div>
+
+      <canvas id="transformCanvas" width="600" height="400"></canvas>
+
+      <div>
+        <label>Translasi X: <span id="txValue">0</span></label>
+        <input type="range" id="txSlider" min="-200" max="200" value="0" oninput="updateTransform()">
+
+        <label>Translasi Y: <span id="tyValue">0</span></label>
+        <input type="range" id="tySlider" min="-150" max="150" value="0" oninput="updateTransform()">
+
+        <label>Rotasi: <span id="rotValue">0</span>°</label>
+        <input type="range" id="rotSlider" min="0" max="360" value="0" oninput="updateTransform()">
+
+        <label>Skala: <span id="scaleValue">1.0</span>x</label>
+        <input type="range" id="scaleSlider" min="0.5" max="2" step="0.1" value="1" oninput="updateTransform()">
+
+        <button onclick="resetTransform()">Reset</button>
+      </div>
+    </div>
+
+    <!-- 5. Matriks Transformasi -->
+    <div class="section" id="matriks">
+      <h2>5. Matriks Transformasi</h2>
+
+      <div class="info">
+        <strong>Konsep:</strong> Menggunakan matriks 3×3 untuk transformasi 2D
+      </div>
+
+      <h3>5.1 Matriks Translasi</h3>
+      <div class="formula">
+        [1  0  dx]   [x]   [x + dx]<br>
+        [0  1  dy] × [y] = [y + dy]<br>
+        [0  0  1 ]   [1]   [  1   ]
+      </div>
+
+      <h3>5.2 Matriks Rotasi</h3>
+      <div class="formula">
+        [cos(θ) -sin(θ)  0]   [x]   [x×cos(θ) - y×sin(θ)]<br>
+        [sin(θ)  cos(θ)  0] × [y] = [x×sin(θ) + y×cos(θ)]<br>
+        [  0       0     1]   [1]   [         1         ]
+      </div>
+
+      <h3>5.3 Matriks Skala</h3>
+      <div class="formula">
+        [sx  0   0]   [x]   [x × sx]<br>
+        [0   sy  0] × [y] = [y × sy]<br>
+        [0   0   1]   [1]   [   1   ]
+      </div>
+
+      <h3>5.4 Transformasi Komposit</h3>
+      <p>Menggabungkan beberapa transformasi dengan perkalian matriks:</p>
+      <div class="formula">
+        Matrix_Final = Matrix_Translate × Matrix_Rotate × Matrix_Scale
+      </div>
+
+      <canvas id="matrixCanvas" width="600" height="400"></canvas>
+
+      <div style="text-align: center;">
+        <button onclick="applyMatrix('translate')">Translasi</button>
+        <button onclick="applyMatrix('rotate')">Rotasi</button>
+        <button onclick="applyMatrix('scale')">Skala</button>
+        <button onclick="applyMatrix('composite')">Komposit (Semua)</button>
+        <button onclick="resetMatrix()">Reset</button>
+      </div>
+
+      <div id="matrixInfo" style="margin-top: 15px; font-family: monospace; background: #f4f4f4; padding: 15px; border-radius: 5px;"></div>
+    </div>
+
+    <!-- Kesimpulan -->
+    <div class="section">
+      <h2>✅ Ringkasan</h2>
+
+      <h3>Model Warna</h3>
+      <ul>
+        <li><strong>RGB:</strong> Untuk layar digital (additive)</li>
+        <li><strong>HSV:</strong> Untuk color picking (intuitif)</li>
+        <li><strong>CMYK:</strong> Untuk printing (subtractive)</li>
+      </ul>
+
+      <h3>Blending</h3>
+      <ul>
+        <li>Alpha blending untuk transparansi</li>
+        <li>Blend modes: normal, multiply, screen, overlay</li>
+      </ul>
+
+      <h3>Pencahayaan</h3>
+      <ul>
+        <li>Ambient: cahaya merata</li>
+        <li>Diffuse: cahaya menyebar</li>
+        <li>Specular: highlight/pantulan</li>
+      </ul>
+
+      <h3>Transformasi 2D</h3>
+      <ul>
+        <li><strong>Translasi:</strong> Geser posisi</li>
+        <li><strong>Rotasi:</strong> Putar objek</li>
+        <li><strong>Skala:</strong> Ubah ukuran</li>
+        <li><strong>Matriks:</strong> Kombinasi transformasi</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="nav">
+    <a href="mulai-disini.html">🏠 Kembali ke Beranda</a>
+    <a href="demo-sederhana.html">✨ Demo Sederhana</a>
+    <a href="demo-lengkap.html">🎯 Demo Lengkap</a>
+  </div>
+
+  <script src="dist/tutorial-demo.js"></script>
+</body>
+</html>

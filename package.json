@@ -1,0 +1,19 @@
+{
+  "name": "grafika-komputer-praktikum",
+  "version": "1.0.0",
+  "description": "Simulasi dan Tutorial Grafika Komputer: Piksel vs Vektor, Sistem Koordinat 2D, Representasi Gambar",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
+    "serve": "npx http-server . -p 8080"
+  },
+  "keywords": ["graphics", "pixel", "vector", "coordinate-system", "typescript"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.3.0",
+    "@types/node": "^20.0.0"
+  }
+}
