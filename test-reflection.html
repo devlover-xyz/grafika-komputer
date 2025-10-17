@@ -145,10 +145,14 @@
 
     function drawRightTriangle(ctx, fillColor, strokeColor) {
       // Segitiga siku-siku dengan siku di kiri bawah
+      // A: Kiri bawah (siku) = (-50, 50)
+      // B: Kanan bawah = (50, 50)
+      // C: Kiri atas = (-50, -50)
+
       ctx.beginPath();
-      ctx.moveTo(-50, 50);    // Kiri bawah (siku)
-      ctx.lineTo(50, 50);     // Kanan bawah
-      ctx.lineTo(-50, -50);   // Kiri atas
+      ctx.moveTo(-50, 50);    // Titik A
+      ctx.lineTo(50, 50);     // Titik B
+      ctx.lineTo(-50, -50);   // Titik C
       ctx.closePath();
 
       ctx.fillStyle = fillColor;
@@ -157,10 +161,20 @@
       ctx.lineWidth = 3;
       ctx.stroke();
 
-      // Tambahkan label L untuk menunjukkan orientasi
+      // Label titik A, B, C
       ctx.fillStyle = strokeColor;
-      ctx.font = 'bold 20px Arial';
-      ctx.fillText('L', -15, 10);
+      ctx.font = 'bold 14px Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      // Titik A (kiri bawah - siku)
+      ctx.fillText('A', -50, 50 + 15);
+
+      // Titik B (kanan bawah)
+      ctx.fillText('B', 50, 50 + 15);
+
+      // Titik C (kiri atas)
+      ctx.fillText('C', -50 - 15, -50);
     }
 
     function applyReflection(type) {

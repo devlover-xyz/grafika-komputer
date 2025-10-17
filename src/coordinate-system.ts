@@ -269,6 +269,38 @@ export class CoordinateSystem2D {
   }
 
   /**
+   * Buat matriks reflection terhadap sumbu X
+   * Transformasi: x' = x, y' = -y
+   */
+  static createReflectionXMatrix(): number[] {
+    return [1, 0, 0, -1, 0, 0];
+  }
+
+  /**
+   * Buat matriks reflection terhadap sumbu Y
+   * Transformasi: x' = -x, y' = y
+   */
+  static createReflectionYMatrix(): number[] {
+    return [-1, 0, 0, 1, 0, 0];
+  }
+
+  /**
+   * Buat matriks reflection terhadap origin
+   * Transformasi: x' = -x, y' = -y
+   */
+  static createReflectionOriginMatrix(): number[] {
+    return [-1, 0, 0, -1, 0, 0];
+  }
+
+  /**
+   * Buat matriks reflection terhadap garis y = x (diagonal)
+   * Transformasi: x' = y, y' = x
+   */
+  static createReflectionDiagonalMatrix(): number[] {
+    return [0, 1, 1, 0, 0, 0];
+  }
+
+  /**
    * Kalikan dua matriks transformasi
    * Hasil: matrix1 × matrix2
    */
